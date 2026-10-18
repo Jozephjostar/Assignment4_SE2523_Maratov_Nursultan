@@ -1,0 +1,69 @@
+======================================================================
+   ASSIGNMENT #4: FACADE DESIGN PATTERN DEMONSTRATION
+   Course: ShP-2216 Software Design Patterns | Student: Nursultan Maratov
+======================================================================
+
+----------------------------------------------------------------------
+TEST 1: Successful Order Placement (Happy Path)
+----------------------------------------------------------------------
+
+>>> [OrderProcessingFacade] Starting order ORD-501 for LAPTOP-PRO (2 unit(s)) <<<
+[InventoryService] Checking stock for LAPTOP-PRO: requested=2, available=5 -> AVAILABLE
+[InventoryService] Reserved 2 unit(s) of LAPTOP-PRO for order ORD-501 (Remaining available: 3)
+[PaymentProcessor] Processing payment: order=ORD-501, amount=$2599.98, method=VISA_CREDIT_CARD
+[PaymentProcessor] Payment of $2599.98 SUCCESSFUL for order ORD-501
+[ShippingService] Dispatched order ORD-501 -> Mangilik El Ave 55/8, Astana, Kazakhstan (Tracking: TRK-KZ-1001)
+[InventoryService] Committed stock deduction for order ORD-501 (LAPTOP-PRO)
+[NotificationService] EMAIL -> customer1@domain.com: Order ORD-501 CONFIRMED. Total: $2599.98. Tracking: TRK-KZ-1001
+>>> [OrderProcessingFacade] Order ORD-501 COMPLETED SUCCESSFULLY <<<
+
+[Client Result 1]: OrderResult[SUCCESS | OrderId: ORD-501 | Tracking: TRK-KZ-1001 | Total: $2599.98 | Info: Order completed and dispatched.]
+
+----------------------------------------------------------------------
+TEST 2: Stock Check Failure (Insufficient Inventory)
+----------------------------------------------------------------------
+
+>>> [OrderProcessingFacade] Starting order ORD-502 for LAPTOP-PRO (10 unit(s)) <<<
+[InventoryService] Checking stock for LAPTOP-PRO: requested=10, available=3 -> OUT_OF_STOCK
+[InventoryService] Reservation FAILED for order ORD-502 (LAPTOP-PRO x 10)
+
+[Client Result 2]: OrderResult[FAILED | OrderId: ORD-502 | Reason: Product LAPTOP-PRO is out of stock or requested quantity unavailable.]
+
+----------------------------------------------------------------------
+TEST 3: Payment Decline with Automatic Inventory Rollback
+----------------------------------------------------------------------
+
+>>> [OrderProcessingFacade] Starting order ORD-503 for WIRELESS-BUDS (2 unit(s)) <<<
+[InventoryService] Checking stock for WIRELESS-BUDS: requested=2, available=2 -> AVAILABLE
+[InventoryService] Reserved 2 unit(s) of WIRELESS-BUDS for order ORD-503 (Remaining available: 0)
+[PaymentProcessor] Processing payment: order=ORD-503, amount=$299.98, method=DECLINED_CARD
+[PaymentProcessor] Payment DECLINED: insufficient funds or blocked card for order ORD-503
+[InventoryService] ROLLBACK: Released 2 unit(s) of WIRELESS-BUDS for order ORD-503 (Restored stock: 2)
+[NotificationService] ALERT -> customer3@domain.com: Payment for Order ORD-503 FAILED (Payment declined by provider). No funds charged.
+
+[Client Result 3]: OrderResult[FAILED | OrderId: ORD-503 | Reason: Payment declined for order ORD-503. Reserved inventory has been released.]
+
+----------------------------------------------------------------------
+TEST 4: Order Cancellation (Refund, Shipment Cancel, Stock Restored)
+----------------------------------------------------------------------
+
+>>> [OrderProcessingFacade] Processing cancellation for order ORD-501 <<<
+[ShippingService] ROLLBACK: Cancelled courier dispatch for tracking TRK-KZ-1001
+[PaymentProcessor] ROLLBACK: Refunded $2599.98 for order ORD-501
+[InventoryService] ROLLBACK: Released 2 unit(s) of LAPTOP-PRO for order ORD-501 (Restored stock: 5)
+[NotificationService] EMAIL -> customer1@domain.com: Order ORD-501 CANCELLED. Refund of $2599.98 issued.
+>>> [OrderProcessingFacade] Order ORD-501 CANCELLED SUCCESSFULLY <<<
+
+[Client Result 4]: Cancellation status for ORD-501 = SUCCESS
+
+----------------------------------------------------------------------
+TEST 5: Advanced Client Direct Access (Bypassing the Facade)
+----------------------------------------------------------------------
+[Advanced Client Note]: Warehouse manager directly accesses InventoryService
+Direct inventory check for SMARTPHONE-X: 10
+[InventoryService] Restocked SMARTPHONE-X: +15 (Current total: 25)
+Updated stock for SMARTPHONE-X: 25
+
+======================================================================
+ALL DEMONSTRATION TESTS COMPLETED SUCCESSFULLY (5/5 PASS)
+======================================================================
