@@ -1,16 +1,9 @@
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Subsystem component responsible for transaction billing, payment verification,
- * and processing refunds.
- *
- * Note: Subsystem is unaware of the Facade and can be directly used by financial
- * or accounting modules.
- */
 public class PaymentProcessor {
 
-    private final Map<String, Double> settledPayments = new HashMap<>(); // orderId -> amount
+    private final Map<String, Double> settledPayments = new HashMap<>();
 
     public boolean processPayment(String orderId, double amount, String paymentMethod) {
         System.out.printf("[PaymentProcessor] Processing payment: order=%s, amount=$%.2f, method=%s%n",
@@ -21,7 +14,6 @@ public class PaymentProcessor {
             return false;
         }
 
-        // Realistic failure simulation when card is declined / invalid
         if (paymentMethod != null && paymentMethod.equalsIgnoreCase("DECLINED_CARD")) {
             System.out.printf("[PaymentProcessor] Payment DECLINED: insufficient funds or blocked card for order %s%n", orderId);
             return false;

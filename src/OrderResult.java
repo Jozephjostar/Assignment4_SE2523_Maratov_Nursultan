@@ -1,7 +1,3 @@
-/**
- * Encapsulates the high-level outcome of an order operation.
- * Prevents leaking low-level subsystem data structures or exception types to the client.
- */
 public class OrderResult {
 
     private final boolean success;

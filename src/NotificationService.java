@@ -1,10 +1,3 @@
-/**
- * Subsystem component responsible for communicating with customers via notifications
- * (email, SMS, receipts).
- *
- * Note: Subsystem is unaware of the Facade and can be directly used by customer support
- * or automated notification alerts.
- */
 public class NotificationService {
 
     public void sendOrderConfirmation(String email, String orderId, String trackingNumber, double totalAmount) {

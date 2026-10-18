@@ -1,20 +1,12 @@
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Subsystem component responsible for stock management, inventory verification,
- * and stock reservation/rollback operations.
- *
- * Note: This subsystem is completely independent of the Facade and can be used
- * directly by warehouse or inventory management clients.
- */
 public class InventoryService {
 
     private final Map<String, Integer> stockLevels = new HashMap<>();
-    private final Map<String, Integer> reservations = new HashMap<>(); // key: orderId + "#" + productId
+    private final Map<String, Integer> reservations = new HashMap<>();
 
     public InventoryService() {
-        // Seed initial warehouse inventory
         stockLevels.put("LAPTOP-PRO", 5);
         stockLevels.put("SMARTPHONE-X", 10);
         stockLevels.put("WIRELESS-BUDS", 2);

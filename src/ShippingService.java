@@ -1,17 +1,10 @@
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Subsystem component responsible for order dispatch, courier coordination,
- * tracking generation, and shipping cancellation.
- *
- * Note: Subsystem is unaware of the Facade and can be directly used by logistics
- * or courier services.
- */
 public class ShippingService {
 
-    private final Map<String, String> orderTrackingMap = new HashMap<>(); // orderId -> trackingNumber
-    private final Map<String, String> trackingAddressMap = new HashMap<>(); // trackingNumber -> address
+    private final Map<String, String> orderTrackingMap = new HashMap<>();
+    private final Map<String, String> trackingAddressMap = new HashMap<>();
     private int trackingCounter = 1000;
 
     public String dispatchOrder(String orderId, String destinationAddress) {
@@ -36,7 +29,6 @@ public class ShippingService {
         }
 
         trackingAddressMap.remove(trackingNumber);
-        // Remove from order tracking map
         orderTrackingMap.values().removeIf(t -> t.equals(trackingNumber));
         System.out.printf("[ShippingService] ROLLBACK: Cancelled courier dispatch for tracking %s%n", trackingNumber);
         return true;
