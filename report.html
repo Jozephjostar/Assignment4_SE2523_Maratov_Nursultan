@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Assignment 4 Report — Facade Pattern</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 12mm 14mm 12mm 14mm;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      font-size: 11px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+    }
+    .header {
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+    .univ-title {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      margin: 0 0 2px 0;
+    }
+    .course-title {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #2563eb;
+      margin: 0 0 3px 0;
+    }
+    h1 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 6px 0;
+    }
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+    }
+    .meta-table td {
+      border: 1px solid #cbd5e1;
+      padding: 5px 8px;
+      background: #f8fafc;
+      font-size: 10px;
+    }
+    .meta-table td strong {
+      color: #334155;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e3a8a;
+      border-left: 3px solid #2563eb;
+      padding-left: 6px;
+      margin: 10px 0 5px 0;
+    }
+    h3 {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 6px 0 3px 0;
+    }
+    p {
+      margin: 0 0 5px 0;
+      text-align: justify;
+    }
+    .uml-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 6px;
+      background: #ffffff;
+      margin: 6px 0 6px 0;
+      text-align: center;
+    }
+    .uml-box svg {
+      width: 100%;
+      height: auto;
+      max-height: 240px;
+    }
+    .code-box {
+      background: #0f172a;
+      color: #f1f5f9;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 9px;
+      line-height: 1.35;
+      margin: 3px 0 4px 0;
+      white-space: pre-wrap;
+    }
+    .excerpt-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      padding: 6px 8px;
+      margin-bottom: 6px;
+    }
+    .excerpt-title {
+      font-weight: 700;
+      color: #1e3a8a;
+      font-size: 10px;
+      margin-bottom: 2px;
+    }
+    .benefit {
+      color: #047857;
+      font-size: 9.5px;
+      font-weight: 500;
+      margin-top: 3px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9.5px;
+      margin: 5px 0 6px 0;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 4px 6px;
+      text-align: left;
+    }
+    th {
+      background: #f1f5f9;
+      color: #1e293b;
+      font-weight: 700;
+    }
+    .badge {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+    }
+    .badge-pass {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    ul, ol {
+      margin: 2px 0 5px 16px;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="univ-title">Astana IT University • Department of Software Engineering</div>
+    <div class="course-title">ShP-2216 – Software Design Patterns (OP 6B06102)</div>
+    <h1>Assignment #4: Facade Structural Design Pattern</h1>
+  </div>
+
+  <table class="meta-table">
+    <tr>
+      <td><strong>Student:</strong> Nursultan Maratov</td>
+      <td><strong>Group:</strong> SE-2523</td>
+      <td><strong>Submission Date:</strong> 18.10.2026</td>
+    </tr>
+    <tr>
+      <td><strong>Selected Topic:</strong> Option B — Online Order Processing Facade</td>
+      <td colspan="2"><strong>GitHub Repository:</strong> <a href="https://github.com/nursultanmaratov/Assignment4-FacadePattern" style="color:#2563eb; text-decoration:none;">https://github.com/nursultanmaratov/Assignment4-FacadePattern</a></td>
+    </tr>
+  </table>
+
+  <h2>1. Introduction — Chosen Subsystem & Motivation for Facade</h2>
+  <p>
+    In contemporary enterprise systems, placing an e-commerce order is rarely an atomic, single-step operation. Instead, it involves orchestrating multiple heterogeneous, independent subsystem services: verifying stock and locking goods in <code>InventoryService</code>, charging credit cards via an external payment gateway in <code>PaymentProcessor</code>, booking carrier labels and generating tracking IDs in <code>ShippingService</code>, and sending status updates via <code>NotificationService</code>.
+  </p>
+  <p>
+    <strong>Why a Facade is required:</strong> Without a Facade, the client (e.g. mobile app, web checkout controller, POS terminal) must directly instantiate and manually orchestrate all four services in exact sequence. Furthermore, the client would be forced to handle intermediate transaction failures and execute compensating rollback actions (e.g. releasing reserved warehouse items when a card is declined). This violates information hiding, tightly couples clients to internal service APIs, and leads to error-prone duplication of orchestration logic.
+  </p>
+  <p>
+    The <code>OrderProcessingFacade</code> wraps these four subsystem classes behind a clean, intuitive API (<code>placeOrder</code>, <code>cancelOrder</code>), completely shielding clients from orchestration complexity, dependency chains, and manual rollback mechanics while keeping subsystem services fully decoupled and accessible to advanced clients.
+  </p>
+
+  <h2>2. UML Class Diagram</h2>
+  <div class="uml-box">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 560" width="100%" height="100%" style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+        </marker>
+        <marker id="darr" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+        </marker>
+      </defs>
+      <!-- Client -->
+      <g transform="translate(30, 200)">
+        <rect width="180" height="90" rx="6" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+        <rect width="180" height="28" rx="6" fill="#e2e8f0" stroke="#64748b" stroke-width="1.5"/>
+        <text x="90" y="19" font-size="12" font-weight="bold" fill="#0f172a" text-anchor="middle">&lt;&lt;Client&gt;&gt; Main</text>
+        <text x="10" y="50" font-size="10" fill="#334155">+ main(args: String[]): void</text>
+        <text x="10" y="70" font-size="9" fill="#64748b" font-style="italic">(uses only the Facade)</text>
+      </g>
+      <path d="M 210 245 L 285 245" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#arr)"/>
+      <text x="248" y="238" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="600">calls</text>
+
+      <!-- Facade -->
+      <g transform="translate(290, 110)">
+        <rect width="270" height="270" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+        <rect width="270" height="34" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+        <text x="135" y="18" font-size="10" fill="#1e40af" text-anchor="middle" font-weight="600">&lt;&lt;Facade&gt;&gt;</text>
+        <text x="135" y="30" font-size="13" font-weight="bold" fill="#1e3a8a" text-anchor="middle">OrderProcessingFacade</text>
+        <text x="10" y="54" font-size="9.5" fill="#1e3a8a">- inventoryService: InventoryService</text>
+        <text x="10" y="70" font-size="9.5" fill="#1e3a8a">- paymentProcessor: PaymentProcessor</text>
+        <text x="10" y="86" font-size="9.5" fill="#1e3a8a">- shippingService: ShippingService</text>
+        <text x="10" y="102" font-size="9.5" fill="#1e3a8a">- notificationService: NotificationService</text>
+        <text x="10" y="118" font-size="9.5" fill="#1e3a8a">- activeOrders: Map&lt;String, ActiveOrderRecord&gt;</text>
+        <line x1="0" y1="128" x2="270" y2="128" stroke="#bfdbfe" stroke-width="1"/>
+        <text x="10" y="148" font-size="10" font-weight="bold" fill="#1e3a8a">+ placeOrder(...): OrderResult</text>
+        <text x="10" y="165" font-size="9" fill="#2563eb">&nbsp;&nbsp;1. reserveStock()</text>
+        <text x="10" y="180" font-size="9" fill="#2563eb">&nbsp;&nbsp;2. processPayment() [compensate if fail]</text>
+        <text x="10" y="195" font-size="9" fill="#2563eb">&nbsp;&nbsp;3. dispatchOrder() [compensate if fail]</text>
+        <text x="10" y="210" font-size="9" fill="#2563eb">&nbsp;&nbsp;4. commitStock() &amp; sendNotification()</text>
+        <text x="10" y="235" font-size="10" font-weight="bold" fill="#1e3a8a">+ cancelOrder(orderId: String): boolean</text>
+        <text x="10" y="252" font-size="9" fill="#2563eb">&nbsp;&nbsp;(courier cancel + refund + stock restored)</text>
+      </g>
+
+      <!-- DTO -->
+      <g transform="translate(180, 420)">
+        <rect width="210" height="110" rx="6" fill="#f8fafc" stroke="#64748b" stroke-width="1.2"/>
+        <rect width="210" height="26" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="1.2"/>
+        <text x="105" y="18" font-size="11" font-weight="bold" fill="#334155" text-anchor="middle">&lt;&lt;DTO&gt;&gt; OrderResult</text>
+        <text x="10" y="44" font-size="9" fill="#475569">- success: boolean | orderId, tracking: String</text>
+        <text x="10" y="60" font-size="9" fill="#475569">- totalAmount: double | message: String</text>
+        <line x1="0" y1="70" x2="210" y2="70" stroke="#cbd5e1" stroke-width="1"/>
+        <text x="10" y="90" font-size="9.5" fill="#1e293b">+ isSuccess(), getTrackingNumber()...</text>
+      </g>
+      <path d="M 360 380 L 320 420" fill="none" stroke="#64748b" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#darr)"/>
+      <text x="350" y="405" font-size="9" fill="#64748b">returns</text>
+
+      <!-- Subsystem -->
+      <rect x="620" y="20" width="310" height="520" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <text x="775" y="44" font-size="12" font-weight="bold" fill="#475569" text-anchor="middle">COMPLEX SUBSYSTEM (No Back-References)</text>
+
+      <g transform="translate(635, 60)">
+        <rect width="280" height="100" rx="5" fill="#ffffff" stroke="#059669" stroke-width="1.5"/>
+        <rect width="280" height="24" rx="5" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+        <text x="140" y="16" font-size="11" font-weight="bold" fill="#065f46" text-anchor="middle">InventoryService</text>
+        <text x="8" y="42" font-size="9" fill="#1e293b">- stockLevels, reservations: Map</text>
+        <line x1="0" y1="48" x2="280" y2="48" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="8" y="64" font-size="9" fill="#065f46">+ hasSufficientStock(pId, qty): boolean</text>
+        <text x="8" y="78" font-size="9" fill="#065f46">+ reserveStock(oId, pId, qty): boolean</text>
+        <text x="8" y="92" font-size="9" fill="#065f46">+ releaseStock(oId, pId, qty): void</text>
+      </g>
+
+      <g transform="translate(635, 180)">
+        <rect width="280" height="95" rx="5" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+        <rect width="280" height="24" rx="5" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+        <text x="140" y="16" font-size="11" font-weight="bold" fill="#92400e" text-anchor="middle">PaymentProcessor</text>
+        <text x="8" y="42" font-size="9" fill="#1e293b">- settledPayments: Map&lt;String, Double&gt;</text>
+        <line x1="0" y1="48" x2="280" y2="48" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="8" y="64" font-size="9" fill="#92400e">+ processPayment(oId, amt, method): boolean</text>
+        <text x="8" y="80" font-size="9" fill="#92400e">+ refundPayment(oId): boolean</text>
+      </g>
+
+      <g transform="translate(635, 295)">
+        <rect width="280" height="95" rx="5" fill="#ffffff" stroke="#7c3aed" stroke-width="1.5"/>
+        <rect width="280" height="24" rx="5" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="140" y="16" font-size="11" font-weight="bold" fill="#5b21b6" text-anchor="middle">ShippingService</text>
+        <text x="8" y="42" font-size="9" fill="#1e293b">- orderTrackingMap, trackingAddressMap: Map</text>
+        <line x1="0" y1="48" x2="280" y2="48" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="8" y="64" font-size="9" fill="#5b21b6">+ dispatchOrder(oId, address): String</text>
+        <text x="8" y="80" font-size="9" fill="#5b21b6">+ cancelShipment(trackingNumber): boolean</text>
+      </g>
+
+      <g transform="translate(635, 410)">
+        <rect width="280" height="105" rx="5" fill="#ffffff" stroke="#db2777" stroke-width="1.5"/>
+        <rect width="280" height="24" rx="5" fill="#fdf2f8" stroke="#db2777" stroke-width="1.5"/>
+        <text x="140" y="16" font-size="11" font-weight="bold" fill="#9d174d" text-anchor="middle">NotificationService</text>
+        <text x="8" y="48" font-size="9" fill="#9d174d">+ sendOrderConfirmation(...): void</text>
+        <text x="8" y="66" font-size="9" fill="#9d174d">+ sendPaymentFailureNotification(...): void</text>
+        <text x="8" y="84" font-size="9" fill="#9d174d">+ sendCancellationNotification(...): void</text>
+      </g>
+
+      <!-- Connections -->
+      <path d="M 560 160 C 590 140, 590 110, 630 110" fill="none" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arr)"/>
+      <path d="M 560 210 C 590 210, 595 225, 630 225" fill="none" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arr)"/>
+      <path d="M 560 270 C 590 270, 595 340, 630 340" fill="none" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arr)"/>
+      <path d="M 560 330 C 585 350, 595 455, 630 455" fill="none" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h2>3. Clean Code Principles Justification (Section 4)</h2>
+
+  <!-- Principle 1 -->
+  <div class="excerpt-card">
+    <div class="excerpt-title">Principle 1: Meaningful & Intention-Revealing Names</div>
+    <p>
+      Method and class names reveal business intent rather than mechanistic operations. The Facade exposes two simple, highly communicative entry points: <code>placeOrder(...)</code> and <code>cancelOrder(...)</code>. Subsystem methods clearly express what they do (<code>reserveStock</code>, <code>releaseStock</code>, <code>processPayment</code>, <code>dispatchOrder</code>).
+    </p>
+    <div class="code-box">// BEFORE (Ambiguous procedural naming):
+boolean status = facade.execute("ORD-1", "LAPTOP", 2, 1200.0, "c@m.com", "Addr", "VISA");
+facade.rollbackOp("ORD-1");
+
+// AFTER (Clean, intention-revealing API):
+OrderResult result = facade.placeOrder(orderId, productId, quantity, price, email, address, method);
+boolean isCancelled = facade.cancelOrder(orderId);</div>
+    <div class="benefit">✓ Benefit: Client code reads like human prose; call sites are self-documenting.</div>
+  </div>
+
+  <!-- Principle 2 -->
+  <div class="excerpt-card">
+    <div class="excerpt-title">Principle 2: Single Responsibility Principle (SRP)</div>
+    <p>
+      The Facade is strictly an <strong>orchestrator</strong>. It delegates domain mechanics to their respective experts and never duplicates calculation or business algorithms inside itself.
+    </p>
+    <div class="code-box">// ANNOTATED CODE EXCERPT (OrderProcessingFacade.java):
+public OrderResult placeOrder(...) {
+    // 1. Inventory responsibility stays in InventoryService
+    if (!inventoryService.reserveStock(orderId, productId, quantity)) { ... }
+    
+    // 2. Financial billing stays in PaymentProcessor
+    if (!paymentProcessor.processPayment(orderId, totalAmount, paymentMethod)) { ... }
+    
+    // 3. Courier logistics stays in ShippingService
+    String trackingNumber = shippingService.dispatchOrder(orderId, shippingAddress);
+    
+    // 4. Communication stays in NotificationService
+    notificationService.sendOrderConfirmation(customerEmail, orderId, trackingNumber, totalAmount);
+}</div>
+    <div class="benefit">✓ Benefit: High cohesion and low coupling; changes to payment gateway APIs never touch inventory or facade logic.</div>
+  </div>
+
+  <!-- Principle 3 -->
+  <div class="excerpt-card">
+    <div class="excerpt-title">Principle 3: No Leaking of Subsystem Details through Public Interface</div>
+    <p>
+      Subsystem internal maps, reservation locks, carrier-specific tracking address records, and intermediate states remain strictly encapsulated. The client receives a clean, immutable <code>OrderResult</code> DTO.
+    </p>
+    <div class="code-box">// BEFORE (Leaking subsystem internals to client):
+Map&lt;String, Object&gt; rawData = facade.placeOrder(...);
+boolean success = (Boolean) rawData.get("INVENTORY_LOCK_SUCCESS");
+String rawGatewayCode = (String) rawData.get("STRIPE_RESPONSE_CODE");
+
+// AFTER (Strict Encapsulation via OrderResult DTO):
+OrderResult result = facade.placeOrder(...);
+if (result.isSuccess()) {
+    System.out.println("Tracking: " + result.getTrackingNumber());
+}</div>
+    <div class="benefit">✓ Benefit: Subsystem implementations can be completely refactored or replaced without affecting clients.</div>
+  </div>
+
+  <!-- Principle 4 -->
+  <div class="excerpt-card">
+    <div class="excerpt-title">Principle 4: Small, Focused Subsystem Classes with Zero Back-References</div>
+    <p>
+      Each subsystem service is concise, focused on one conceptual responsibility, and completely ignorant of the Facade's existence. This preserves the defining property of the pattern: advanced clients can still access subsystem classes directly.
+    </p>
+    <div class="code-box">// Advanced client (e.g. Warehouse Inventory Manager) directly using subsystem:
+InventoryService directInventory = new InventoryService();
+directInventory.addStock("SMARTPHONE-X", 15);
+int total = directInventory.getStock("SMARTPHONE-X"); // Bypasses Facade cleanly</div>
+    <div class="benefit">✓ Benefit: Subsystems do not degrade into monolithic helper classes; they remain first-class components.</div>
+  </div>
+
+  <!-- Principle 5 -->
+  <div class="excerpt-card">
+    <div class="excerpt-title">Principle 5: Resilient Error Handling & Compensating Rollback</div>
+    <p>
+      In distributed multi-step coordination, failure midway through must not leave system state corrupted. When payment declines, the Facade immediately performs compensating actions: releasing the reserved warehouse stock and notifying the customer.
+    </p>
+    <div class="code-box">// ANNOTATED CODE EXCERPT (Compensating Rollback in OrderProcessingFacade):
+boolean paymentSuccess = paymentProcessor.processPayment(orderId, totalAmount, paymentMethod);
+if (!paymentSuccess) {
+    // Compensating action: restore stock reserved in Step 1
+    inventoryService.releaseStock(orderId, productId, quantity);
+    notificationService.sendPaymentFailureNotification(customerEmail, orderId, "Payment declined by provider");
+    return OrderResult.failure(orderId, "Payment declined. Reserved inventory has been released.");
+}</div>
+    <div class="benefit">✓ Benefit: Eliminates phantom inventory locks and financial inconsistencies without client intervention.</div>
+  </div>
+
+  <h2>4. Conclusion — What the Facade Hides vs. What Remains Accessible</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 45%;">What the Facade Hides from Clients</th>
+        <th style="width: 55%;">What Remains Directly Accessible</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          • Multi-step orchestration order across 4 services.<br>
+          • Stock reservation keys and temporary locking logic.<br>
+          • Compensating transactions (automated rollbacks on failure).<br>
+          • Direct dependencies and import coupling to subsystem classes.
+        </td>
+        <td>
+          • <code>InventoryService</code>: warehouse restock, audits, stock queries.<br>
+          • <code>PaymentProcessor</code>: accounting audits, independent manual charges/refunds.<br>
+          • <code>ShippingService</code>: courier pickups, route updates, tracking lookups.<br>
+          • <code>NotificationService</code>: direct transactional notifications.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>5. Verification & Test Evidence (5/5 Tests Passed)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Test</th>
+        <th>Scenario</th>
+        <th>Verified Behavior</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>T1</strong></td>
+        <td>Happy Path Order Placement</td>
+        <td>Stock reserved (5 &rarr; 3), payment $2599.98 settled, tracking <code>TRK-KZ-1001</code> assigned, email confirmed.</td>
+        <td><span class="badge badge-pass">PASS</span></td>
+      </tr>
+      <tr>
+        <td><strong>T2</strong></td>
+        <td>Insufficient Inventory</td>
+        <td>Requested 10 units of LAPTOP-PRO (only 3 available). Fast-fail before payment or shipping.</td>
+        <td><span class="badge badge-pass">PASS</span></td>
+      </tr>
+      <tr>
+        <td><strong>T3</strong></td>
+        <td>Payment Decline &amp; Rollback</td>
+        <td>Stock reserved for WIRELESS-BUDS (2 &rarr; 0), payment declined. Rollback triggered: stock restored to 2!</td>
+        <td><span class="badge badge-pass">PASS</span></td>
+      </tr>
+      <tr>
+        <td><strong>T4</strong></td>
+        <td>Order Cancellation</td>
+        <td>Cancelled ORD-501: courier dispatch cancelled, $2599.98 refunded, 2 laptops restored (3 &rarr; 5).</td>
+        <td><span class="badge badge-pass">PASS</span></td>
+      </tr>
+      <tr>
+        <td><strong>T5</strong></td>
+        <td>Direct Subsystem Access</td>
+        <td>Bypassed Facade to directly restock SMARTPHONE-X (+15 units) via <code>InventoryService</code>.</td>
+        <td><span class="badge badge-pass">PASS</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
